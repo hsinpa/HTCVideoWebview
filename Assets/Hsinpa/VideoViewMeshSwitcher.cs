@@ -28,8 +28,12 @@ public class VideoViewMeshSwitcher : MonoBehaviour
 
     private int currentIndex = 0;
 
+    private enum SteroType { None, Top_Bottom, Left_Right, Custom_UV };
+    private SteroType steroType;
+
     private void Start()
     {
+        steroType = SteroType.None;
         SubscribeKeyboardEvent();
         RotateViewType(currentIndex);
     }
@@ -52,11 +56,19 @@ public class VideoViewMeshSwitcher : MonoBehaviour
         mesh.mesh = meshTypes[index];
         renderer.material = materialTypes[index];
 
+        if (IsSteroVideoType(renderer.material.name)) {
+            renderer.material.SetFloat("Stereo", (int)SteroType.Left_Right);
+        }
+        
         applyToMesh.enabled = false;
 
         _ = Utility.UtilityMethod.DoDelayWork(0.1f, () => {
             applyToMesh.enabled = true;
         });
+    }
+
+    private bool IsSteroVideoType(string name) {
+        return (renderer.material.name.IndexOf("360") >= 0 || renderer.material.name.IndexOf("180") >= 0);
     }
 
 }
